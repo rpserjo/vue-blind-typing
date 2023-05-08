@@ -1,4 +1,5 @@
 <script setup>
+    import { onMounted, watch } from 'vue';
     import { useAppStore } from '@/store/appStore';
     import Header from '@/components/Header.vue';
     import TaskStatus from '@/components/TaskStatus.vue';
@@ -7,6 +8,20 @@
     import Spinner from '@/components/Spinner.vue';
 
     const store = useAppStore();
+
+    watch(store.getSettings, () => {
+        localStorage.setItem('settings', JSON.stringify({ lang: store.getSettings.lang, length: store.getSettings.length }));
+    });
+
+    onMounted(() => {
+        try {
+            const { lang, length } = JSON.parse(localStorage.getItem('settings'));
+            store.updateSettings('lang', lang);
+            store.updateSettings('length', length);
+        } catch(e) {
+            console.log('Error while reading saved settings. Default values are used');
+        }
+    });
 </script>
 
 <template>
